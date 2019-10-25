@@ -3,7 +3,7 @@
 ## Quick Start
 
   - Open rstudio in binder and press knit.
-  - 
+  
 ## Example Output
 
    - ![](abundance_barplot.png)
@@ -25,7 +25,9 @@ OR
  
 ## Authors
 
- - Author Name, github id (and ORCID if you have it)
+ - Alia Al-Haj
+    - Github repo: https://github.com/aliaalhaj
+    - ORCID: 
 
 
 ## Links
