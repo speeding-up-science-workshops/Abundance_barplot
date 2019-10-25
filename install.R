@@ -1,6 +1,6 @@
 pkgs = c("tidyverse", "extrafont", "ggplot2", "dplyr","knitr", "plyr", "car", "lsmeans")
 if (!requireNamespace("BiocManager", quietly = TRUE))
   install.packages("BiocManager")
-  BiocManager::install("phyloseq", version = 3.8)
+  BiocManager::install("phyloseq", version = 3.9)
 ncores = parallel::detectCores()
 install.packages(pkgs, Ncpus = ncores)
