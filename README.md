@@ -6,14 +6,21 @@
   - 
 ## Example Output
 
-   - 
+   - ![](abundance_barplot.png)
 
 ## Summary
+  - You can explore differences amongst taxa in metabarcoding data in several different ways. This file will help you determine differences amongst categories in the most abundant taxa in your dataset.
+Outputs include:
+  1. A group of barplots of the log abundance of the top 20 taxa in the chosen taxonomic category
+  2. An ANOVA with post-hoc Tukey test
 
-   - What is the visualization?
-   - What data goes in (and what preprocessing is necessary)?
-   - How should we use/interpret this visualization?
- 
+Inputs:
+1. otu table
+2. taxa table
+3. mapping file
+OR
+1. phyloseq file
+
  
 ## Authors
 
