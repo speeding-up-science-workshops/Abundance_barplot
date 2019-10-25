@@ -6,21 +6,66 @@ output: html_document
 ---
 
 ##Motivation:
-Barplots of differences across factors for top 20 taxa
+You can explore differences amongst taxa in metabarcoding data in several different ways. This file will help you determine differences amongst categories in the most abundant taxa in your dataset.
+Outputs include:
+  1. A group of barplots of the log abundance of the top 20 taxa in the chosen taxonomic category
+  2. An ANOVA with post-hoc Tukey test
+  
+Code is adapted from a tutorial available at this address: https://benjjneb.github.io/dada2/tutorial.html
 
-```{r top 10, include = TRUE, results = "hide"}
-require(ggplot2)
-require(extrafont)
+Required packages:
+```{r}
+library(ggplot2)
+library(extrafont)
+library(tidyverse)
+library(dplyr)
+library(plyr)
+```
+
+Load data:
+We are using the tara oceans 16S rRNA dataset to execute this code: https://www.ebi.ac.uk/services/tara-oceans-data
+```{r}
 require(tidyverse)
-require(dplyr)
-require(plyr)
+require(phyloseq)
+otutable_raw <- read_csv(file = "https://raw.githubusercontent.com/aliaalhaj/random_forest_Al-Haj/master/otu.csv")
+otu <- as.data.frame(otutable_raw)
+otu<-subset(otu, select=-c(X1)) #if there are more columns that are non-numeric (i.e. taxonomy) add in to the -c(). For example, if you have a column named taxonomy select=-c(X1, taxonomy).
+row.names(otu) <- otutable_raw$X1
+otu <- otu_table(otu, taxa_are_rows = T) #this makes the OTU table into an object pyloseq can use
+
+taxatable_raw <- read_csv(file = "https://raw.githubusercontent.com/aliaalhaj/random_forest_Al-Haj/master/taxa.csv")
+taxonomy <-as.data.frame(taxatable_raw)
+row.names(taxonomy)<- taxatable_raw$X1
+taxonomy <- apply(taxonomy, 2, function(x) gsub("^$|^ $", NA, x))
+taxonomy <- as.matrix(taxonomy)
+taxonomy <- tax_table(taxonomy) #This makes the taxa table into an object phyloseq can use
+
+
+map <- read_csv(file = "https://raw.githubusercontent.com/aliaalhaj/random_forest_Al-Haj/master/Tara_oceans_mapping_file.csv")
+names(map)[1] <- 'SampleID'
+row.names(map) <- map$SampleID
+map[2:4] <- lapply(map[2:4] , factor) #change to columns where your factors are
+map2 <- data.frame(map)
+meta <- sample_data(map) #This makes the mapping data into an object phyloseq can use
+
+```
+
+Import as phyloseq object (If you already have a phyloseq object, you can start from here.)
+```{r}
+require(phyloseq)
+ps <- phyloseq(otu, taxonomy, meta)
+```
+
+Pick out the top 20 taxa and normalize counts
+```{r top 10, include = TRUE, results = "hide"}
 top20 <- names(sort(taxa_sums(ps), decreasing=TRUE))[1:20] #sort phyloseq object by top 10 abundance taxa
 ps.top20 <- transform_sample_counts(ps, function(OTU) OTU/sum(OTU)) #transform the sample counts to normalize across OTUs
 ps.top20 <- prune_taxa(top20, ps) #trim the dataset for top 10 taxa only
 taxa_sums(ps.top20)
+```
 
-
-#For error bars
+Manipulate data to calculate averages and standard error
+```{r}
 # convert your processed phyloseq object into a dataframe
 df <- psmelt(ps.top20)
 
@@ -41,10 +86,13 @@ avgs$se <- se$se
 #Log transform mean and se columns
 avgs$log_mean <- log10(avgs$mean)
 avgs$log_se <- log10(avgs$se)
+```
 
-# plot bar graph with standard deviation as error bars
+
+Plot bar graph with standard error as error bars.
+```{r}
 p<-ggplot(data=avgs, aes(fill = Depth, x=Depth, y=log_mean)) +
-  geom_bar( stat="identity", position="stack", color = "black") + #Makes it into a barplot
+  geom_bar( stat="identity", position="stack", color = "black") + #Makes it into a barplot. Color adds an outline on the bars.
    ylab("Log Abundance") + #y-axis label
   facet_wrap(~Class, ncol = 4) + #This will make a graph for each class in our dataframe
   geom_errorbar(aes(ymin=log_mean-log_se, ymax=log_mean+log_se), width=.2, position=position_dodge(.9)) + # add error bars
@@ -55,6 +103,7 @@ p<-ggplot(data=avgs, aes(fill = Depth, x=Depth, y=log_mean)) +
   theme(text=element_text(family="Times New Roman", size=14)) #Set font type and size. You will need to import font types to use common fonts.
 p
 ```
+
 
 Are any of these statistically different? We'll use an ANOVA to compare
 ```{r}
