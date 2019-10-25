@@ -13,6 +13,13 @@ Outputs include:
   
 Code is adapted from a tutorial available at this address: https://benjjneb.github.io/dada2/tutorial.html
 
+## Inputs
+We create a Phyloseq object using:
+1) A table of per-sample, per-ASV abundances ("OTU table"), 
+2) A metadata file 
+3) A taxonomy file
+
+
 Required packages:
 ```{r}
 library(ggplot2)
