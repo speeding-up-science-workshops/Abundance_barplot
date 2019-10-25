@@ -18,6 +18,7 @@ Inputs:
 1. otu table
 2. taxa table
 3. mapping file
+
 OR
 1. phyloseq file
 
