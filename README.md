@@ -1,5 +1,7 @@
 # Abundance Barplot
 
+[![DOI](https://zenodo.org/badge/217631488.svg)](https://zenodo.org/badge/latestdoi/217631488)
+
 ## Quick Start
 
   - Open rstudio in binder and press knit.
